@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pozitīvais un Negatīvais Laukums – 7.3</title>
+<style>
+  :root {
+    --sand: #E8DFD0;
+    --sand-light: #F4EFE6;
+    --sand-mid: #D4C9B5;
+    --gray-light: #C8C2B8;
+    --gray-mid: #8A8480;
+    --gray-dark: #4A4642;
+    --gray-deep: #2E2C2A;
+    --white: #FAFAFA;
+    --black: #111110;
+    --accent: #7A6E60;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Candara', 'Calibri', sans-serif;
+    background: var(--sand-light);
+    color: var(--gray-deep);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    gap: 14px;
+  }
+  h1 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .toolbar {
+    background: var(--sand);
+    border: 1px solid var(--sand-mid);
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 920px;
+  }
+  .tool-group { display: flex; gap: 6px; align-items: center; }
+  .tool-label {
+    font-size: 0.72rem;
+    color: var(--gray-mid);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+  button {
+    cursor: pointer;
+    border: 1.5px solid var(--gray-light);
+    border-radius: 7px;
+    background: var(--white);
+    color: var(--gray-deep);
+    font-family: inherit;
+    font-size: 0.8rem;
+    padding: 5px 11px;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  button:hover { background: var(--sand-mid); border-color: var(--accent); }
+  button.active {
+    background: var(--gray-deep);
+    color: var(--sand-light);
+    border-color: var(--gray-deep);
+  }
+  input[type=range] { width: 80px; accent-color: var(--accent); }
+  .divider { width: 1px; height: 28px; background: var(--gray-light); margin: 0 2px; }
+
+  .mode-tabs {
+    display: flex;
+    gap: 6px;
+    background: var(--sand);
+    border: 1px solid var(--sand-mid);
+    border-radius: 10px;
+    padding: 6px 10px;
+    width: 100%;
+    max-width: 920px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+  }
+  .mode-label { font-size: 0.72rem; color: var(--gray-mid); text-transform: uppercase; letter-spacing: 0.05em; }
+  .tab-btn { padding: 5px 14px; font-size: 0.82rem; border-radius: 6px; }
+  .tab-btn.active { background: var(--accent); color: var(--sand-light); border-color: var(--accent); }
+
+  .canvas-area {
+    background: var(--sand-mid);
+    border-radius: 14px;
+    padding: 10px;
+    width: 100%;
+    max-width: 920px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  .orient-label {
+    font-size: 0.72rem; color: var(--gray-mid);
+    text-transform: uppercase; letter-spacing: 0.05em; align-self: flex-start;
+  }
+  #canvasContainer {
+    display: flex;
+    gap: 3px;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    user-select: none;
+  }
+  #canvasContainer.horizontal { flex-direction: row; }
+  #canvasContainer.vertical { flex-direction: column; }
+  canvas { display: block; }
+  .canvas-hint { font-size: 0.72rem; color: var(--gray-mid); text-align: center; padding: 0 4px; }
+
+  .badge { font-size: 0.68rem; letter-spacing: 0.04em; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; font-weight: 600; }
+  .badge-white { background: var(--white); color: var(--gray-deep); }
+  .badge-black { background: var(--gray-deep); color: var(--sand-light); }
+  .badge-row { display: flex; gap: 8px; width: 100%; max-width: 920px; justify-content: center; }
+
+  #escherPalette { display: none; gap: 6px; align-items: center; }
+  #escherPalette.visible { display: flex; }
+  .esc-color-btn { width: 28px; height: 28px; border-radius: 50%; padding: 0; border: 2px solid var(--gray-light); }
+  .esc-color-btn.active { border-color: var(--accent); border-width: 3px; }
+  .esc-black { background: #111110; }
+  .esc-white { background: #FAFAFA; }
+  .esc-gray  { background: #888; }
+
+  /* ── ESCHER STAMP PANEL ── */
+  #escherStamps {
+    display: none;
+    background: var(--sand);
+    border: 1px solid var(--sand-mid);
+    border-radius: 12px;
+    padding: 8px 14px;
+    width: 100%;
+    max-width: 920px;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+  }
+  #escherStamps.visible { display: flex; }
+
+  .stamp-preview {
+    width: 48px; height: 48px;
+    border: 2px solid var(--gray-light);
+    border-radius: 8px;
+    background: var(--white);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .stamp-preview:hover { border-color: var(--accent); background: var(--sand-mid); }
+  .stamp-preview.active { border-color: var(--accent); border-width: 3px; background: var(--sand-mid); }
+  .stamp-preview canvas { pointer-events: none; }
+
+  .stamp-controls {
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  }
+  .stamp-size-label { font-size: 0.72rem; color: var(--gray-mid); }
+
+  /* stamp cursor overlay */
+  #stampCursor {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    opacity: 0.7;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<h1>Pozitīvais &amp; Negatīvais Laukums</h1>
+
+<!-- MODE TABS -->
+<div class="mode-tabs">
+  <span class="mode-label">Variants:</span>
+  <button class="tab-btn active" id="tab1">1 – Spogulis</button>
+  <button class="tab-btn" id="tab2">2 – Brīvi</button>
+  <button class="tab-btn" id="tab3">3 – Ešers</button>
+  <div class="divider"></div>
+  <span class="mode-label">Orientācija:</span>
+  <button class="tab-btn" id="orientH">↔ Horizontāla</button>
+  <button class="tab-btn active" id="orientV">↕ Vertikāla</button>
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="tool-group">
+    <span class="tool-label">Rīks:</span>
+    <button class="active" id="toolPencil">✏️ Zīmulis</button>
+    <button id="toolBrush">🖌️ Ota</button>
+    <button id="toolEraser">⬜ Dzēšgumija</button>
+  </div>
+  <div class="divider"></div>
+  <div class="tool-group">
+    <span class="tool-label">Izmērs:</span>
+    <input type="range" id="sizeSlider" min="1" max="40" value="6">
+    <span id="sizeLabel" style="font-size:0.78rem;color:var(--gray-mid);min-width:24px">6</span>
+  </div>
+  <div class="divider"></div>
+  <div class="tool-group" id="escherPalette">
+    <span class="tool-label">Krāsa:</span>
+    <button class="esc-color-btn esc-black active" id="escBlack" title="Melns"></button>
+    <button class="esc-color-btn esc-white" id="escWhite" title="Balts"></button>
+    <button class="esc-color-btn esc-gray"  id="escGray"  title="Pelēks"></button>
+  </div>
+  <div class="tool-group">
+    <button id="clearBtn">🗑️ Notīrīt</button>
+  </div>
+</div>
+
+<!-- ESCHER STAMP PANEL -->
+<div id="escherStamps">
+  <span class="tool-label">Figūras:</span>
+  <!-- stamp buttons injected by JS -->
+  <div class="divider"></div>
+  <div class="stamp-controls">
+    <span class="stamp-size-label">Lielums:</span>
+    <input type="range" id="stampSize" min="20" max="160" value="60" style="width:90px;accent-color:#7A6E60">
+    <span id="stampSizeLabel" style="font-size:0.78rem;color:#8A8480;min-width:28px">60</span>
+    <span class="stamp-size-label" style="margin-left:6px">Pagrieziens:</span>
+    <input type="range" id="stampRot" min="0" max="359" value="0" style="width:90px;accent-color:#7A6E60">
+    <span id="stampRotLabel" style="font-size:0.78rem;color:#8A8480;min-width:32px">0°</span>
+    <button id="toolStamp" class="tab-btn" style="margin-left:4px">🔵 Spiedogs</button>
+  </div>
+</div>
+
+<!-- BADGE ROW -->
+<div class="badge-row" id="badgeRow">
+  <span class="badge badge-white" id="badgeLeft">Pozitīvs (balts fons)</span>
+  <span class="badge badge-black" id="badgeRight">Negatīvs (melns fons) – automātiski</span>
+</div>
+
+<!-- CANVAS AREA -->
+<div class="canvas-area">
+  <span class="orient-label" id="orientLabel">Vertikāla (balta augšpusē)</span>
+  <div id="canvasContainer" class="vertical">
+    <canvas id="canvasA"></canvas>
+    <canvas id="canvasB"></canvas>
+  </div>
+  <div class="canvas-hint" id="hintText">Zīmē augšējā (baltajā) daļā — apakšā automātiski parādās spoguļattēls pretējās krāsās.</div>
+</div>
+
+<!-- floating stamp cursor -->
+<canvas id="stampCursor"></canvas>
+
+<script>
+// ══════════════════════════════════════════
+//  SHAPE DEFINITIONS  (SVG paths, unit coords 0..1)
+// ══════════════════════════════════════════
+const SHAPES = [
+  {
+    id: 'rhombus',
+    label: 'Rombs',
+    draw(ctx, w, h, color) {
+      ctx.beginPath();
+      ctx.moveTo(w*0.5, h*0.04);
+      ctx.lineTo(w*0.96, h*0.5);
+      ctx.lineTo(w*0.5, h*0.96);
+      ctx.lineTo(w*0.04, h*0.5);
+      ctx.closePath();
+      ctx.fillStyle = color; ctx.fill();
+    }
+  },
+  {
+    id: 'bird',
+    label: 'Putns',
+    draw(ctx, w, h, color) {
+      // Stylised flying bird (Escher-like)
+      ctx.beginPath();
+      // body
+      ctx.moveTo(w*0.5, h*0.55);
+      ctx.bezierCurveTo(w*0.35,h*0.42, w*0.1,h*0.38, w*0.03,h*0.45);
+      ctx.bezierCurveTo(w*0.12,h*0.32, w*0.3,h*0.28, w*0.5,h*0.38);
+      // right wing
+      ctx.bezierCurveTo(w*0.7,h*0.28, w*0.88,h*0.32, w*0.97,h*0.45);
+      ctx.bezierCurveTo(w*0.9,h*0.38, w*0.65,h*0.42, w*0.5,h*0.55);
+      // tail
+      ctx.bezierCurveTo(w*0.44,h*0.72, w*0.38,h*0.82, w*0.3,h*0.88);
+      ctx.bezierCurveTo(w*0.42,h*0.78, w*0.5,h*0.68, w*0.5,h*0.55);
+      ctx.bezierCurveTo(w*0.5,h*0.68, w*0.58,h*0.78, w*0.7,h*0.88);
+      ctx.bezierCurveTo(w*0.62,h*0.82, w*0.56,h*0.72, w*0.5,h*0.55);
+      ctx.closePath();
+      ctx.fillStyle = color; ctx.fill();
+      // head
+      ctx.beginPath();
+      ctx.ellipse(w*0.5, h*0.28, w*0.1, h*0.1, 0, 0, Math.PI*2);
+      ctx.fillStyle = color; ctx.fill();
+      // beak
+      ctx.beginPath();
+      ctx.moveTo(w*0.5, h*0.24);
+      ctx.lineTo(w*0.62, h*0.22);
+      ctx.lineTo(w*0.5, h*0.32);
+      ctx.closePath();
+      ctx.fillStyle = color; ctx.fill();
+    }
+  },
+  {
+    id: 'fish',
+    label: 'Zivs',
+    draw(ctx, w, h, color) {
+      ctx.beginPath();
+      // body
+      ctx.moveTo(w*0.82, h*0.5);
+      ctx.bezierCurveTo(w*0.7,h*0.2, w*0.2,h*0.18, w*0.1,h*0.5);
+      ctx.bezierCurveTo(w*0.2,h*0.82, w*0.7,h*0.8, w*0.82,h*0.5);
+      ctx.closePath();
+      ctx.fillStyle = color; ctx.fill();
+      // tail
+      ctx.beginPath();
+      ctx.moveTo(w*0.82, h*0.5);
+      ctx.lineTo(w*0.97, h*0.28);
+      ctx.lineTo(w*0.93, h*0.5);
+      ctx.lineTo(w*0.97, h*0.72);
+      ctx.closePath();
+      ctx.fillStyle = color; ctx.fill();
+      // eye
+      ctx.beginPath();
+      ctx.arc(w*0.22, h*0.44, w*0.045, 0, Math.PI*2);
+      const inv = color === '#111110' ? '#FAFAFA' : '#111110';
+      ctx.fillStyle = inv; ctx.fill();
+    }
+  },
+  {
+    id: 'leaf',
+    label: 'Lapa',
+    draw(ctx, w, h, color) {
+      // define leaf path helper
+      function leafPath() {
+        ctx.beginPath();
+        ctx.moveTo(w*0.5, h*0.05);
+        ctx.bezierCurveTo(w*0.9,h*0.1, w*0.95,h*0.6, w*0.5,h*0.95);
+        ctx.bezierCurveTo(w*0.05,h*0.6, w*0.1,h*0.1, w*0.5,h*0.05);
+        ctx.closePath();
+      }
+      leafPath();
+      ctx.fillStyle = color; ctx.fill();
+      // clip so veins stay inside
+      ctx.save();
+      leafPath();
+      ctx.clip();
+      const inv = color === '#111110' ? '#FAFAFA' : '#111110';
+      ctx.strokeStyle = inv; ctx.lineWidth = w*0.025; ctx.lineCap = 'round';
+      // midrib
+      ctx.beginPath();
+      ctx.moveTo(w*0.5, h*0.08);
+      ctx.lineTo(w*0.5, h*0.9);
+      ctx.stroke();
+      // veins
+      for(let i=1;i<=4;i++){
+        const t = i*0.16+0.1;
+        ctx.beginPath();
+        ctx.moveTo(w*0.5, h*t);
+        ctx.quadraticCurveTo(w*0.7, h*(t+0.06), w*0.78, h*(t+0.12));
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(w*0.5, h*t);
+        ctx.quadraticCurveTo(w*0.3, h*(t+0.06), w*0.22, h*(t+0.12));
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+  },
+  {
+    id: 'flower',
+    label: 'Zieds',
+    draw(ctx, w, h, color) {
+      const cx=w*0.5, cy=h*0.5, r=w*0.22, pr=w*0.16;
+      for(let i=0;i<6;i++){
+        const a = i*Math.PI/3;
+        ctx.beginPath();
+        ctx.ellipse(cx+Math.cos(a)*r, cy+Math.sin(a)*r, pr, pr*0.5, a, 0, Math.PI*2);
+        ctx.fillStyle = color; ctx.fill();
+      }
+      ctx.beginPath();
+      ctx.arc(cx, cy, w*0.18, 0, Math.PI*2);
+      ctx.fillStyle = color; ctx.fill();
+      const inv = color === '#111110' ? '#FAFAFA' : '#111110';
+      ctx.beginPath();
+      ctx.arc(cx, cy, w*0.08, 0, Math.PI*2);
+      ctx.fillStyle = inv; ctx.fill();
+    }
+  },
+  {
+    id: 'spider',
+    label: 'Zirneklis',
+    draw(ctx, w, h, color) {
+      const cx=w*0.5, cy=h*0.54;
+      const inv=color==='#111110'?'#FAFAFA':'#111110';
+      ctx.fillStyle=color; ctx.strokeStyle=color;
+      ctx.lineCap='round'; ctx.lineJoin='round';
+      // 8 legs — 4 each side, curving outward
+      const legData=[
+        // [startAngle offset, ctrl1x, ctrl1y, endX, endY]  mirrored for right side
+        [-0.38,-0.44, 0.12,0.46, -0.44,0.08,0.42],
+        [-0.38,-0.38, 0.22,0.44, -0.38,0.18,0.46],
+        [-0.38,-0.28, 0.34,0.40, -0.28,0.30,0.46],
+        [-0.38,-0.18, 0.44,0.38, -0.18,0.40,0.44],
+      ];
+      // legs as bezier pairs L+R
+      const legDefs=[
+        // left side legs (from body left)
+        {sx:cx-w*0.14,sy:cy-h*0.08, c1x:cx-w*0.42,c1y:cy-h*0.30, ex:cx-w*0.48,ey:cy-h*0.10},
+        {sx:cx-w*0.14,sy:cy,        c1x:cx-w*0.46,c1y:cy-h*0.10, ex:cx-w*0.50,ey:cy+h*0.16},
+        {sx:cx-w*0.14,sy:cy+h*0.08, c1x:cx-w*0.44,c1y:cy+h*0.14, ex:cx-w*0.46,ey:cy+h*0.36},
+        {sx:cx-w*0.10,sy:cy+h*0.14, c1x:cx-w*0.34,c1y:cy+h*0.30, ex:cx-w*0.30,ey:cy+h*0.44},
+      ];
+      ctx.lineWidth=w*0.045;
+      // draw 4 legs each side (mirror right)
+      legDefs.forEach(({sx,sy,c1x,c1y,ex,ey})=>{
+        // left
+        ctx.beginPath(); ctx.moveTo(sx,sy);
+        ctx.quadraticCurveTo(c1x,c1y,ex,ey); ctx.stroke();
+        // right (mirror around cx)
+        const rx=cx+(cx-sx), rc1x=cx+(cx-c1x), rex=cx+(cx-ex);
+        ctx.beginPath(); ctx.moveTo(rx,sy);
+        ctx.quadraticCurveTo(rc1x,c1y,rex,ey); ctx.stroke();
+      });
+      // abdomen (large rear oval)
+      ctx.beginPath();
+      ctx.ellipse(cx, cy+h*0.16, w*0.20, h*0.22, 0, 0, Math.PI*2);
+      ctx.fill();
+      // cephalothorax (front body)
+      ctx.beginPath();
+      ctx.ellipse(cx, cy-h*0.06, w*0.14, h*0.14, 0, 0, Math.PI*2);
+      ctx.fill();
+      // eyes — 4 pairs on cephalothorax
+      const eyePositions=[[-0.07,-0.15],[0.07,-0.15],[-0.04,-0.20],[0.04,-0.20]];
+      eyePositions.forEach(([dx,dy])=>{
+        ctx.beginPath();
+        ctx.arc(cx+w*dx, cy+h*dy, w*0.025, 0, Math.PI*2);
+        ctx.fillStyle=inv; ctx.fill();
+        ctx.fillStyle=color;
+      });
+    }
+  },
+  {
+    id: 'star',
+    label: 'Zvaigzne',
+    draw(ctx, w, h, color) {
+      const cx=w*0.5, cy=h*0.5, R=w*0.44, r=w*0.18, n=6;
+      ctx.beginPath();
+      for(let i=0;i<n*2;i++){
+        const rad = (i*Math.PI/n) - Math.PI/2;
+        const rr = i%2===0 ? R : r;
+        i===0 ? ctx.moveTo(cx+rr*Math.cos(rad),cy+rr*Math.sin(rad))
+               : ctx.lineTo(cx+rr*Math.cos(rad),cy+rr*Math.sin(rad));
+      }
+      ctx.closePath();
+      ctx.fillStyle = color; ctx.fill();
+    }
+  },
+  {
+    id: 'butterfly',
+    label: 'Tauriņš',
+    draw(ctx, w, h, color) {
+      ctx.fillStyle = color;
+      // upper wings
+      ctx.beginPath();
+      ctx.moveTo(w*0.5,h*0.4);
+      ctx.bezierCurveTo(w*0.35,h*0.1,w*0.05,h*0.15,w*0.08,h*0.45);
+      ctx.bezierCurveTo(w*0.1,h*0.62,w*0.38,h*0.58,w*0.5,h*0.5);
+      ctx.closePath(); ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(w*0.5,h*0.4);
+      ctx.bezierCurveTo(w*0.65,h*0.1,w*0.95,h*0.15,w*0.92,h*0.45);
+      ctx.bezierCurveTo(w*0.9,h*0.62,w*0.62,h*0.58,w*0.5,h*0.5);
+      ctx.closePath(); ctx.fill();
+      // lower wings
+      ctx.beginPath();
+      ctx.moveTo(w*0.5,h*0.5);
+      ctx.bezierCurveTo(w*0.3,h*0.55,w*0.08,h*0.72,w*0.15,h*0.88);
+      ctx.bezierCurveTo(w*0.25,h*0.98,w*0.44,h*0.82,w*0.5,h*0.68);
+      ctx.closePath(); ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(w*0.5,h*0.5);
+      ctx.bezierCurveTo(w*0.7,h*0.55,w*0.92,h*0.72,w*0.85,h*0.88);
+      ctx.bezierCurveTo(w*0.75,h*0.98,w*0.56,h*0.82,w*0.5,h*0.68);
+      ctx.closePath(); ctx.fill();
+      // body
+      ctx.beginPath();
+      ctx.ellipse(w*0.5,h*0.52,w*0.04,h*0.2,0,0,Math.PI*2);
+      const inv=color==='#111110'?'#FAFAFA':'#111110';
+      ctx.fillStyle=inv; ctx.fill();
+    }
+  }
+];
+
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+const TOTAL_W = 880, TOTAL_H = 520;
+let orientation = 'vertical';
+let variant = 1;
+let tool = 'pencil';
+let brushSize = 6;
+let escherColor = '#111110';
+let isDrawing = false;
+let lastX = 0, lastY = 0;
+
+// stamp state
+let stampShapeId = null;
+let stampSize = 60;
+let stampRot = 0;
+
+const canvasA = document.getElementById('canvasA');
+const canvasB = document.getElementById('canvasB');
+const ctxA = canvasA.getContext('2d');
+const ctxB = canvasB.getContext('2d');
+const container = document.getElementById('canvasContainer');
+const stampCursorEl = document.getElementById('stampCursor');
+const stampCursorCtx = stampCursorEl.getContext('2d');
+
+// ── BUILD STAMP PANEL ──
+function buildStampPanel() {
+  const panel = document.getElementById('escherStamps');
+  SHAPES.forEach(shape => {
+    const btn = document.createElement('div');
+    btn.className = 'stamp-preview';
+    btn.title = shape.label;
+    btn.dataset.id = shape.id;
+    const previewC = document.createElement('canvas');
+    previewC.width = 40; previewC.height = 40;
+    const pCtx = previewC.getContext('2d');
+    shape.draw(pCtx, 40, 40, '#2E2C2A');
+    btn.appendChild(previewC);
+    btn.addEventListener('click', () => selectStamp(shape.id));
+    panel.insertBefore(btn, panel.querySelector('.divider'));
+  });
+}
+buildStampPanel();
+
+function selectStamp(id) {
+  stampShapeId = id;
+  tool = 'stamp';
+  document.querySelectorAll('.stamp-preview').forEach(b => b.classList.toggle('active', b.dataset.id === id));
+  document.getElementById('toolStamp').classList.add('active');
+  document.querySelectorAll('#toolPencil,#toolBrush,#toolEraser').forEach(b => b.classList.remove('active'));
+  updateCursorCanvas();
+}
+
+// ── STAMP CURSOR CANVAS ──
+function updateCursorCanvas() {
+  if (!stampShapeId) return;
+  const sz = stampSize;
+  stampCursorEl.width = sz + 4;
+  stampCursorEl.height = sz + 4;
+  stampCursorCtx.clearRect(0, 0, sz+4, sz+4);
+  stampCursorCtx.save();
+  stampCursorCtx.translate((sz+4)/2, (sz+4)/2);
+  stampCursorCtx.rotate(stampRot * Math.PI / 180);
+  stampCursorCtx.translate(-(sz)/2, -(sz)/2);
+  const shape = SHAPES.find(s => s.id === stampShapeId);
+  if (shape) shape.draw(stampCursorCtx, sz, sz, escherColor);
+  stampCursorCtx.restore();
+}
+
+document.addEventListener('mousemove', e => {
+  if (tool === 'stamp' && stampShapeId) {
+    stampCursorEl.style.display = 'block';
+    stampCursorEl.style.left = e.clientX + 'px';
+    stampCursorEl.style.top  = e.clientY + 'px';
+  } else {
+    stampCursorEl.style.display = 'none';
+  }
+});
+
+// ── STAMP DRAW ──
+function stampAt(ctx, cx, cy) {
+  const shape = SHAPES.find(s => s.id === stampShapeId);
+  if (!shape) return;
+  const sz = stampSize;
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(stampRot * Math.PI / 180);
+  ctx.translate(-sz/2, -sz/2);
+  shape.draw(ctx, sz, sz, escherColor);
+  ctx.restore();
+}
+
+// ══════════════════════════════════════════
+//  SIZING & BG
+// ══════════════════════════════════════════
+function setCanvasSizes() {
+  const isV = orientation === 'vertical';
+  if (variant === 3) {
+    canvasA.width = TOTAL_W; canvasA.height = TOTAL_H;
+    canvasB.style.display = 'none';
+  } else {
+    canvasB.style.display = 'block';
+    if (isV) {
+      canvasA.width = canvasB.width = TOTAL_W;
+      canvasA.height = canvasB.height = TOTAL_H / 2;
+    } else {
+      canvasA.width = canvasB.width = TOTAL_W / 2;
+      canvasA.height = canvasB.height = TOTAL_H;
+    }
+  }
+  fillBG();
+}
+function fillBG() {
+  if (variant === 3) {
+    ctxA.fillStyle = '#888888';
+    ctxA.fillRect(0, 0, canvasA.width, canvasA.height);
+    return;
+  }
+  ctxA.fillStyle = '#FAFAFA';
+  ctxA.fillRect(0, 0, canvasA.width, canvasA.height);
+  ctxB.fillStyle = '#111110';
+  ctxB.fillRect(0, 0, canvasB.width, canvasB.height);
+}
+
+// ══════════════════════════════════════════
+//  MIRROR
+// ══════════════════════════════════════════
+function mirrorToB() {
+  if (variant !== 1) return;
+  const w = canvasA.width, h = canvasA.height;
+  const imgData = ctxA.getImageData(0, 0, w, h);
+  const d = imgData.data;
+  const inv = new Uint8ClampedArray(d.length);
+  for (let i=0;i<d.length;i+=4){
+    inv[i]=255-d[i]; inv[i+1]=255-d[i+1]; inv[i+2]=255-d[i+2]; inv[i+3]=d[i+3];
+  }
+  const mir = new Uint8ClampedArray(d.length);
+  if (orientation === 'horizontal') {
+    for(let y=0;y<h;y++) for(let x=0;x<w;x++){
+      const s=(y*w+x)*4, dt=(y*w+(w-1-x))*4;
+      mir[dt]=inv[s];mir[dt+1]=inv[s+1];mir[dt+2]=inv[s+2];mir[dt+3]=inv[s+3];
+    }
+  } else {
+    for(let y=0;y<h;y++) for(let x=0;x<w;x++){
+      const s=(y*w+x)*4, dt=((h-1-y)*w+x)*4;
+      mir[dt]=inv[s];mir[dt+1]=inv[s+1];mir[dt+2]=inv[s+2];mir[dt+3]=inv[s+3];
+    }
+  }
+  ctxB.putImageData(new ImageData(mir,w,h),0,0);
+}
+
+// ══════════════════════════════════════════
+//  DRAW
+// ══════════════════════════════════════════
+function getStrokeColor(canvas) {
+  if (tool==='eraser') {
+    if (variant===3) return '#888888';          // gray bg in Escher mode
+    return canvas===canvasA ? '#FAFAFA' : '#111110';
+  }
+  if (variant===3) return escherColor;
+  return canvas===canvasA ? '#111110' : '#FAFAFA';
+}
+function applyTool(ctx, canvas, x, y, isStart) {
+  const color = getStrokeColor(canvas);
+  ctx.globalCompositeOperation='source-over';
+  ctx.strokeStyle=color; ctx.fillStyle=color;
+  ctx.lineCap='round'; ctx.lineJoin='round';
+  if(tool==='pencil'){ ctx.lineWidth=brushSize*0.6; ctx.globalAlpha=1; }
+  else if(tool==='brush'){ ctx.lineWidth=brushSize*1.5; ctx.globalAlpha=0.7; }
+  else if(tool==='eraser'){ ctx.lineWidth=brushSize*2; ctx.globalAlpha=1; }
+  if(isStart){
+    ctx.beginPath();
+    ctx.arc(x,y,ctx.lineWidth/2,0,Math.PI*2);
+    ctx.fill(); ctx.globalAlpha=1; return;
+  }
+  ctx.globalAlpha = tool==='brush'?0.7:1;
+  ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(x,y); ctx.stroke();
+}
+
+function getCanvasCoords(e, canvas) {
+  const rect=canvas.getBoundingClientRect();
+  const sx=canvas.width/rect.width, sy=canvas.height/rect.height;
+  const cx=e.touches?e.touches[0].clientX:e.clientX;
+  const cy=e.touches?e.touches[0].clientY:e.clientY;
+  return {x:(cx-rect.left)*sx, y:(cy-rect.top)*sy};
+}
+
+function onDrawStart(e, canvas, ctx) {
+  if(tool==='stamp'){
+    if(stampShapeId){
+      const {x,y}=getCanvasCoords(e,canvas);
+      stampAt(ctx,x,y);
+      if(variant===1&&canvas===canvasA) mirrorToB();
+    }
+    return;
+  }
+  isDrawing=true;
+  const {x,y}=getCanvasCoords(e,canvas);
+  lastX=x; lastY=y;
+  applyTool(ctx,canvas,x,y,true);
+  if(variant===1&&canvas===canvasA) mirrorToB();
+}
+function onDrawMove(e, canvas, ctx) {
+  if(tool==='stamp') return;
+  if(!isDrawing) return;
+  e.preventDefault();
+  const {x,y}=getCanvasCoords(e,canvas);
+  applyTool(ctx,canvas,x,y,false);
+  if(variant===1&&canvas===canvasA) mirrorToB();
+  lastX=x; lastY=y;
+}
+function onDrawEnd() {
+  isDrawing=false;
+  if(variant===1) mirrorToB();
+}
+
+[[canvasA,ctxA],[canvasB,ctxB]].forEach(([cv,cx])=>{
+  cv.addEventListener('mousedown',  e=>onDrawStart(e,cv,cx));
+  cv.addEventListener('mousemove',  e=>onDrawMove(e,cv,cx));
+  cv.addEventListener('mouseup',    onDrawEnd);
+  cv.addEventListener('mouseleave', onDrawEnd);
+  cv.addEventListener('touchstart', e=>onDrawStart(e,cv,cx),{passive:false});
+  cv.addEventListener('touchmove',  e=>onDrawMove(e,cv,cx),{passive:false});
+  cv.addEventListener('touchend',   onDrawEnd);
+});
+
+// ══════════════════════════════════════════
+//  UI
+// ══════════════════════════════════════════
+function setTool(t) {
+  tool = t;
+  stampShapeId = null;
+  document.querySelectorAll('.stamp-preview').forEach(b=>b.classList.remove('active'));
+  document.getElementById('toolStamp').classList.remove('active');
+  ['toolPencil','toolBrush','toolEraser'].forEach(id=>{
+    document.getElementById(id).classList.toggle('active', id==='tool'+t.charAt(0).toUpperCase()+t.slice(1));
+  });
+  stampCursorEl.style.display='none';
+}
+
+document.getElementById('toolPencil').addEventListener('click',()=>setTool('pencil'));
+document.getElementById('toolBrush').addEventListener('click', ()=>setTool('brush'));
+document.getElementById('toolEraser').addEventListener('click',()=>setTool('eraser'));
+document.getElementById('toolStamp').addEventListener('click', ()=>{
+  if(SHAPES.length>0) selectStamp(SHAPES[0].id);
+});
+
+document.getElementById('sizeSlider').addEventListener('input',e=>{
+  brushSize=parseInt(e.target.value);
+  document.getElementById('sizeLabel').textContent=brushSize;
+});
+document.getElementById('stampSize').addEventListener('input',e=>{
+  stampSize=parseInt(e.target.value);
+  document.getElementById('stampSizeLabel').textContent=stampSize;
+  updateCursorCanvas();
+});
+document.getElementById('stampRot').addEventListener('input',e=>{
+  stampRot=parseInt(e.target.value);
+  document.getElementById('stampRotLabel').textContent=stampRot+'°';
+  updateCursorCanvas();
+});
+
+function updateVariant(v) {
+  variant=v;
+  document.querySelectorAll('.tab-btn[id^="tab"]').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab'+v).classList.add('active');
+  const ep=document.getElementById('escherPalette');
+  const es=document.getElementById('escherStamps');
+  const br=document.getElementById('badgeRow');
+  if(v===1){
+    ep.classList.remove('visible'); es.classList.remove('visible');
+    canvasB.style.pointerEvents='none'; br.style.display='flex';
+    document.getElementById('badgeLeft').textContent='Pozitīvs (balts fons)';
+    document.getElementById('badgeRight').textContent='Negatīvs (melns fons) – automātiski';
+    document.getElementById('hintText').textContent=orientation==='horizontal'
+      ?'Zīmē kreisajā (baltajā) daļā — labajā pusē automātiski parādās spoguļattēls pretējās krāsās.'
+      :'Zīmē augšējā (baltajā) daļā — apakšā automātiski parādās spoguļattēls pretējās krāsās.';
+    if(tool==='stamp') setTool('pencil');
+  } else if(v===2){
+    ep.classList.remove('visible'); es.classList.remove('visible');
+    canvasB.style.pointerEvents='auto'; br.style.display='flex';
+    document.getElementById('badgeLeft').textContent='Pozitīvs – balts fons, zīmē ar melnu';
+    document.getElementById('badgeRight').textContent='Negatīvs – melns fons, zīmē ar baltu';
+    document.getElementById('hintText').textContent='Zīmē abās daļās pats: baltajā – ar melnu, melnajā – ar baltu.';
+    if(tool==='stamp') setTool('pencil');
+  } else {
+    ep.classList.add('visible'); es.classList.add('visible');
+    canvasB.style.display='none'; br.style.display='none';
+    document.getElementById('hintText').textContent='Ešera režīms – izvēlies figūru, krāsu, izmēru un pagriezienu, spiedi uz lapas lai ieliek figūru. Veido mozaīku, kur forma un fons mainās vietām.';
+  }
+  container.classList.toggle('escher-mode',v===3);
+  setCanvasSizes(); updateOrientLabel();
+}
+
+function updateOrientation(o){
+  orientation=o;
+  document.getElementById('orientH').classList.toggle('active',o==='horizontal');
+  document.getElementById('orientV').classList.toggle('active',o==='vertical');
+  container.classList.toggle('horizontal',o==='horizontal');
+  container.classList.toggle('vertical',o==='vertical');
+  setCanvasSizes(); updateOrientLabel();
+  if(variant===1) mirrorToB();
+}
+function updateOrientLabel(){
+  const el=document.getElementById('orientLabel');
+  if(variant===3){el.textContent='Ešera mozaīka – viena lapa';return;}
+  el.textContent=orientation==='vertical'
+    ?'Vertikāla (balta augšpusē, melna apakšā)'
+    :'Horizontāla (balta kreisajā pusē, melna labajā)';
+}
+
+function setEscherColor(c){
+  escherColor=c;
+  document.getElementById('escBlack').classList.toggle('active',c==='#111110');
+  document.getElementById('escWhite').classList.toggle('active',c==='#FAFAFA');
+  document.getElementById('escGray').classList.toggle('active', c==='#888888');
+  updateCursorCanvas();
+  // update stamp preview thumbnails
+  document.querySelectorAll('.stamp-preview').forEach(btn=>{
+    const shape=SHAPES.find(s=>s.id===btn.dataset.id);
+    if(!shape) return;
+    const pc=btn.querySelector('canvas');
+    const pCtx=pc.getContext('2d');
+    pCtx.clearRect(0,0,40,40);
+    shape.draw(pCtx,40,40,c==='#888888'?'#2E2C2A':c);
+  });
+}
+
+document.getElementById('escBlack').addEventListener('click',()=>setEscherColor('#111110'));
+document.getElementById('escWhite').addEventListener('click',()=>setEscherColor('#FAFAFA'));
+document.getElementById('escGray').addEventListener('click', ()=>setEscherColor('#888888'));
+
+document.getElementById('tab1').addEventListener('click',()=>updateVariant(1));
+document.getElementById('tab2').addEventListener('click',()=>updateVariant(2));
+document.getElementById('tab3').addEventListener('click',()=>updateVariant(3));
+document.getElementById('orientH').addEventListener('click',()=>updateOrientation('horizontal'));
+document.getElementById('orientV').addEventListener('click',()=>updateOrientation('vertical'));
+
+document.getElementById('clearBtn').addEventListener('click',()=>fillBG());
+
+// ── INIT ──
+updateVariant(1);
+updateOrientation('vertical');
+</script>
+</body>
+</html>
