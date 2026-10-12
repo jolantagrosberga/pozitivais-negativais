@@ -6,260 +6,172 @@
 <title>Pozitīvais un Negatīvais Laukums – 7.3</title>
 <style>
   :root {
-    --sand: #E8DFD0;
-    --sand-light: #F4EFE6;
-    --sand-mid: #D4C9B5;
-    --gray-light: #C8C2B8;
-    --gray-mid: #8A8480;
-    --gray-dark: #4A4642;
-    --gray-deep: #2E2C2A;
-    --white: #FAFAFA;
-    --black: #111110;
-    --accent: #7A6E60;
+    --sand: #E8DFD0; --sand-light: #F4EFE6; --sand-mid: #D4C9B5;
+    --gray-light: #C8C2B8; --gray-mid: #8A8480; --gray-dark: #4A4642;
+    --gray-deep: #2E2C2A; --white: #FAFAFA; --black: #111110; --accent: #7A6E60;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Candara', 'Calibri', sans-serif;
-    background: var(--sand-light);
-    color: var(--gray-deep);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 16px;
-    gap: 14px;
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body { font-family: 'Candara', 'Calibri', 'Segoe UI', sans-serif; background: var(--sand-light); color: var(--gray-deep); }
+  #app {
+    position: absolute; top: 0; left: 0; width: 1600px; height: 900px;
+    transform-origin: 0 0; overflow: hidden; background: var(--sand-light);
+    display: grid; grid-template-columns: 370px 1fr;
   }
-  h1 {
-    font-size: 1.15rem;
-    font-weight: 600;
-    color: var(--accent);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    text-align: center;
+  /* ── LEFT PANEL ── */
+  .side {
+    background: var(--sand); border-right: 1px solid var(--sand-mid);
+    padding: 22px 22px 18px; display: flex; flex-direction: column; gap: 14px; overflow: hidden;
   }
-  .toolbar {
-    background: var(--sand);
-    border: 1px solid var(--sand-mid);
-    border-radius: 12px;
-    padding: 10px 14px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    max-width: 920px;
-  }
-  .tool-group { display: flex; gap: 6px; align-items: center; }
-  .tool-label {
-    font-size: 0.72rem;
-    color: var(--gray-mid);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    white-space: nowrap;
-  }
+  h1 { font-size: 22px; font-weight: 700; color: var(--accent); letter-spacing: 0.04em; text-transform: uppercase; line-height: 1.25; }
+  .sec { display: flex; flex-direction: column; gap: 7px; }
+  .sec-label { font-size: 13px; color: var(--gray-mid); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+  .row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .row.fill > button { flex: 1; }
   button {
-    cursor: pointer;
-    border: 1.5px solid var(--gray-light);
-    border-radius: 7px;
-    background: var(--white);
-    color: var(--gray-deep);
-    font-family: inherit;
-    font-size: 0.8rem;
-    padding: 5px 11px;
-    transition: all 0.15s;
-    white-space: nowrap;
+    cursor: pointer; border: 1.5px solid var(--gray-light); border-radius: 8px;
+    background: var(--white); color: var(--gray-deep); font-family: inherit;
+    font-size: 15px; padding: 8px 10px; transition: all 0.15s; white-space: nowrap;
   }
   button:hover { background: var(--sand-mid); border-color: var(--accent); }
-  button.active {
-    background: var(--gray-deep);
-    color: var(--sand-light);
-    border-color: var(--gray-deep);
-  }
-  input[type=range] { width: 80px; accent-color: var(--accent); }
-  .divider { width: 1px; height: 28px; background: var(--gray-light); margin: 0 2px; }
-
-  .mode-tabs {
-    display: flex;
-    gap: 6px;
-    background: var(--sand);
-    border: 1px solid var(--sand-mid);
-    border-radius: 10px;
-    padding: 6px 10px;
-    width: 100%;
-    max-width: 920px;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-  }
-  .mode-label { font-size: 0.72rem; color: var(--gray-mid); text-transform: uppercase; letter-spacing: 0.05em; }
-  .tab-btn { padding: 5px 14px; font-size: 0.82rem; border-radius: 6px; }
+  button.active { background: var(--gray-deep); color: var(--sand-light); border-color: var(--gray-deep); }
   .tab-btn.active { background: var(--accent); color: var(--sand-light); border-color: var(--accent); }
+  input[type=range] { flex: 1; accent-color: var(--accent); }
+  .val { font-size: 15px; color: var(--gray-mid); min-width: 40px; text-align: right; }
+  .sl-name { font-size: 14px; color: var(--gray-dark); min-width: 92px; }
+  .sep { height: 1px; background: var(--sand-mid); }
 
-  .canvas-area {
-    background: var(--sand-mid);
-    border-radius: 14px;
-    padding: 10px;
-    width: 100%;
-    max-width: 920px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-  }
-  .orient-label {
-    font-size: 0.72rem; color: var(--gray-mid);
-    text-transform: uppercase; letter-spacing: 0.05em; align-self: flex-start;
-  }
-  #canvasContainer {
-    display: flex;
-    gap: 3px;
-    border-radius: 8px;
-    overflow: hidden;
-    position: relative;
-    user-select: none;
-  }
-  #canvasContainer.horizontal { flex-direction: row; }
-  #canvasContainer.vertical { flex-direction: column; }
-  canvas { display: block; }
-  .canvas-hint { font-size: 0.72rem; color: var(--gray-mid); text-align: center; padding: 0 4px; }
-
-  .badge { font-size: 0.68rem; letter-spacing: 0.04em; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; font-weight: 600; }
-  .badge-white { background: var(--white); color: var(--gray-deep); }
-  .badge-black { background: var(--gray-deep); color: var(--sand-light); }
-  .badge-row { display: flex; gap: 8px; width: 100%; max-width: 920px; justify-content: center; }
-
-  #escherPalette { display: none; gap: 6px; align-items: center; }
+  #escherPalette { display: none; }
   #escherPalette.visible { display: flex; }
-  .esc-color-btn { width: 28px; height: 28px; border-radius: 50%; padding: 0; border: 2px solid var(--gray-light); }
-  .esc-color-btn.active { border-color: var(--accent); border-width: 3px; }
-  .esc-black { background: #111110; }
-  .esc-white { background: #FAFAFA; }
-  .esc-gray  { background: #888; }
+  .esc-color-btn { width: 38px; height: 38px; border-radius: 50%; padding: 0; border: 2px solid var(--gray-light); flex: none !important; }
+  .esc-color-btn.active { border-color: var(--accent); border-width: 4px; }
+  .esc-black, .esc-black:hover { background: #111110; }
+  .esc-white, .esc-white:hover { background: #FAFAFA; }
+  .esc-gray, .esc-gray:hover  { background: #888; }
 
-  /* ── ESCHER STAMP PANEL ── */
-  #escherStamps {
-    display: none;
-    background: var(--sand);
-    border: 1px solid var(--sand-mid);
-    border-radius: 12px;
-    padding: 8px 14px;
-    width: 100%;
-    max-width: 920px;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-items: center;
-    justify-content: center;
-  }
+  #escherStamps { display: none; flex-direction: column; gap: 8px; }
   #escherStamps.visible { display: flex; }
-
+  .stamp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
   .stamp-preview {
-    width: 48px; height: 48px;
-    border: 2px solid var(--gray-light);
-    border-radius: 8px;
-    background: var(--white);
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.15s;
-    flex-shrink: 0;
+    height: 64px; border: 2px solid var(--gray-light); border-radius: 9px; background: var(--white);
+    cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s;
   }
   .stamp-preview:hover { border-color: var(--accent); background: var(--sand-mid); }
   .stamp-preview.active { border-color: var(--accent); border-width: 3px; background: var(--sand-mid); }
-  .stamp-preview canvas { pointer-events: none; }
+  .stamp-preview canvas { pointer-events: none; width: 46px; height: 46px; }
 
-  .stamp-controls {
-    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
-  }
-  .stamp-size-label { font-size: 0.72rem; color: var(--gray-mid); }
+  .side-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 8px; }
+  #fsBtn { background: var(--gray-deep); color: var(--sand-light); border-color: var(--gray-deep); font-size: 16px; padding: 11px; }
+  #fsBtn:hover { background: var(--accent); border-color: var(--accent); }
 
-  /* stamp cursor overlay */
-  #stampCursor {
-    position: fixed;
-    pointer-events: none;
-    z-index: 9999;
-    transform: translate(-50%, -50%);
-    opacity: 0.7;
-    display: none;
-  }
+  /* ── CANVAS AREA ── */
+  .main { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 14px 20px; }
+  .main-top { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .orient-label { font-size: 14px; color: var(--gray-mid); text-transform: uppercase; letter-spacing: 0.05em; }
+  .badge-row { display: flex; gap: 8px; }
+  .badge { font-size: 13px; letter-spacing: 0.04em; padding: 4px 10px; border-radius: 12px; text-transform: uppercase; font-weight: 600; }
+  .badge-white { background: var(--white); color: var(--gray-deep); border: 1px solid var(--gray-light); }
+  .badge-black { background: var(--gray-deep); color: var(--sand-light); }
+  .canvas-wrap { background: var(--sand-mid); border-radius: 14px; padding: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+  #canvasContainer { display: flex; gap: 3px; border-radius: 8px; overflow: hidden; position: relative; user-select: none; }
+  #canvasContainer.horizontal { flex-direction: row; }
+  #canvasContainer.vertical { flex-direction: column; }
+  canvas { display: block; }
+  #canvasContainer canvas { touch-action: none; }
+  .canvas-hint { font-size: 15px; color: var(--gray-dark); text-align: center; max-width: 1100px; line-height: 1.4; }
+
+  #stampCursor { position: absolute; pointer-events: none; z-index: 50; transform: translate(-50%, -50%); opacity: 0.7; display: none; }
 </style>
 </head>
 <body>
+<div id="app">
+  <aside class="side">
+    <h1>Pozitīvais &amp; Negatīvais Laukums</h1>
 
-<h1>Pozitīvais &amp; Negatīvais Laukums</h1>
+    <div class="sec">
+      <span class="sec-label">Variants</span>
+      <div class="row fill">
+        <button class="tab-btn active" id="tab1">1 – Spogulis</button>
+        <button class="tab-btn" id="tab2">2 – Brīvi</button>
+        <button class="tab-btn" id="tab3">3 – Ešers</button>
+      </div>
+    </div>
 
-<!-- MODE TABS -->
-<div class="mode-tabs">
-  <span class="mode-label">Variants:</span>
-  <button class="tab-btn active" id="tab1">1 – Spogulis</button>
-  <button class="tab-btn" id="tab2">2 – Brīvi</button>
-  <button class="tab-btn" id="tab3">3 – Ešers</button>
-  <div class="divider"></div>
-  <span class="mode-label">Orientācija:</span>
-  <button class="tab-btn" id="orientH">↔ Horizontāla</button>
-  <button class="tab-btn active" id="orientV">↕ Vertikāla</button>
+    <div class="sec" id="orientSec">
+      <span class="sec-label">Orientācija</span>
+      <div class="row fill">
+        <button class="tab-btn" id="orientH">↔ Horizontāla</button>
+        <button class="tab-btn active" id="orientV">↕ Vertikāla</button>
+      </div>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="sec">
+      <span class="sec-label">Rīks</span>
+      <div class="row fill">
+        <button class="active" id="toolPencil">✏️ Zīmulis</button>
+        <button id="toolBrush">🖌️ Ota</button>
+        <button id="toolEraser">⬜ Dzēšgumija</button>
+      </div>
+      <div class="row">
+        <span class="sl-name">Izmērs</span>
+        <input type="range" id="sizeSlider" min="1" max="40" value="6">
+        <span class="val" id="sizeLabel">6</span>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="row" id="escherPalette">
+        <span class="sl-name">Krāsa</span>
+        <button class="esc-color-btn esc-black active" id="escBlack" title="Melns"></button>
+        <button class="esc-color-btn esc-white" id="escWhite" title="Balts"></button>
+        <button class="esc-color-btn esc-gray"  id="escGray"  title="Pelēks"></button>
+      </div>
+    </div>
+
+    <div id="escherStamps">
+      <span class="sec-label">Figūras</span>
+      <div class="stamp-grid" id="stampGrid"></div>
+      <div class="row">
+        <span class="sl-name">Lielums</span>
+        <input type="range" id="stampSize" min="20" max="200" value="80">
+        <span class="val" id="stampSizeLabel">80</span>
+      </div>
+      <div class="row">
+        <span class="sl-name">Pagrieziens</span>
+        <input type="range" id="stampRot" min="0" max="359" value="0">
+        <span class="val" id="stampRotLabel">0°</span>
+      </div>
+      <div class="row fill"><button id="toolStamp" class="tab-btn">🔵 Spiedogs</button></div>
+    </div>
+
+    <div class="side-bottom">
+      <button id="clearBtn">🗑️ Notīrīt</button>
+      <button id="fsBtn">⛶ Atvērt pilnekrānu</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="main-top" id="mainTop">
+      <span class="orient-label" id="orientLabel">Vertikāla (balta augšpusē)</span>
+      <div class="badge-row" id="badgeRow">
+        <span class="badge badge-white" id="badgeLeft">Pozitīvs (balts fons)</span>
+        <span class="badge badge-black" id="badgeRight">Negatīvs (melns fons) – automātiski</span>
+      </div>
+    </div>
+    <div class="canvas-wrap">
+      <div id="canvasContainer" class="vertical">
+        <canvas id="canvasA"></canvas>
+        <canvas id="canvasB"></canvas>
+      </div>
+    </div>
+    <div class="canvas-hint" id="hintText">Zīmē augšējā (baltajā) daļā — apakšā automātiski parādās spoguļattēls pretējās krāsās.</div>
+  </main>
+
+  <!-- stamp cursor (inside #app, internal coordinates) -->
+  <canvas id="stampCursor"></canvas>
 </div>
-
-<!-- TOOLBAR -->
-<div class="toolbar">
-  <div class="tool-group">
-    <span class="tool-label">Rīks:</span>
-    <button class="active" id="toolPencil">✏️ Zīmulis</button>
-    <button id="toolBrush">🖌️ Ota</button>
-    <button id="toolEraser">⬜ Dzēšgumija</button>
-  </div>
-  <div class="divider"></div>
-  <div class="tool-group">
-    <span class="tool-label">Izmērs:</span>
-    <input type="range" id="sizeSlider" min="1" max="40" value="6">
-    <span id="sizeLabel" style="font-size:0.78rem;color:var(--gray-mid);min-width:24px">6</span>
-  </div>
-  <div class="divider"></div>
-  <div class="tool-group" id="escherPalette">
-    <span class="tool-label">Krāsa:</span>
-    <button class="esc-color-btn esc-black active" id="escBlack" title="Melns"></button>
-    <button class="esc-color-btn esc-white" id="escWhite" title="Balts"></button>
-    <button class="esc-color-btn esc-gray"  id="escGray"  title="Pelēks"></button>
-  </div>
-  <div class="tool-group">
-    <button id="clearBtn">🗑️ Notīrīt</button>
-  </div>
-</div>
-
-<!-- ESCHER STAMP PANEL -->
-<div id="escherStamps">
-  <span class="tool-label">Figūras:</span>
-  <!-- stamp buttons injected by JS -->
-  <div class="divider"></div>
-  <div class="stamp-controls">
-    <span class="stamp-size-label">Lielums:</span>
-    <input type="range" id="stampSize" min="20" max="160" value="60" style="width:90px;accent-color:#7A6E60">
-    <span id="stampSizeLabel" style="font-size:0.78rem;color:#8A8480;min-width:28px">60</span>
-    <span class="stamp-size-label" style="margin-left:6px">Pagrieziens:</span>
-    <input type="range" id="stampRot" min="0" max="359" value="0" style="width:90px;accent-color:#7A6E60">
-    <span id="stampRotLabel" style="font-size:0.78rem;color:#8A8480;min-width:32px">0°</span>
-    <button id="toolStamp" class="tab-btn" style="margin-left:4px">🔵 Spiedogs</button>
-  </div>
-</div>
-
-<!-- BADGE ROW -->
-<div class="badge-row" id="badgeRow">
-  <span class="badge badge-white" id="badgeLeft">Pozitīvs (balts fons)</span>
-  <span class="badge badge-black" id="badgeRight">Negatīvs (melns fons) – automātiski</span>
-</div>
-
-<!-- CANVAS AREA -->
-<div class="canvas-area">
-  <span class="orient-label" id="orientLabel">Vertikāla (balta augšpusē)</span>
-  <div id="canvasContainer" class="vertical">
-    <canvas id="canvasA"></canvas>
-    <canvas id="canvasB"></canvas>
-  </div>
-  <div class="canvas-hint" id="hintText">Zīmē augšējā (baltajā) daļā — apakšā automātiski parādās spoguļattēls pretējās krāsās.</div>
-</div>
-
-<!-- floating stamp cursor -->
-<canvas id="stampCursor"></canvas>
 
 <script>
 // ══════════════════════════════════════════
@@ -506,7 +418,8 @@ const SHAPES = [
 // ══════════════════════════════════════════
 //  STATE
 // ══════════════════════════════════════════
-const TOTAL_W = 880, TOTAL_H = 520;
+const TOTAL_W = 1160, TOTAL_H = 740;   // zīmēšanas laukums (iekšējās 16:9 koordinātās)
+const PREV = 92;                        // figūru priekšskatījuma izšķirtspēja
 let orientation = 'vertical';
 let variant = 1;
 let tool = 'pencil';
@@ -517,7 +430,7 @@ let lastX = 0, lastY = 0;
 
 // stamp state
 let stampShapeId = null;
-let stampSize = 60;
+let stampSize = 80;
 let stampRot = 0;
 
 const canvasA = document.getElementById('canvasA');
@@ -527,22 +440,24 @@ const ctxB = canvasB.getContext('2d');
 const container = document.getElementById('canvasContainer');
 const stampCursorEl = document.getElementById('stampCursor');
 const stampCursorCtx = stampCursorEl.getContext('2d');
+const appEl = document.getElementById('app');
+let APP_SCALE = 1;
 
 // ── BUILD STAMP PANEL ──
 function buildStampPanel() {
-  const panel = document.getElementById('escherStamps');
+  const panel = document.getElementById('stampGrid');
   SHAPES.forEach(shape => {
     const btn = document.createElement('div');
     btn.className = 'stamp-preview';
     btn.title = shape.label;
     btn.dataset.id = shape.id;
     const previewC = document.createElement('canvas');
-    previewC.width = 40; previewC.height = 40;
+    previewC.width = PREV; previewC.height = PREV;
     const pCtx = previewC.getContext('2d');
-    shape.draw(pCtx, 40, 40, '#2E2C2A');
+    shape.draw(pCtx, PREV, PREV, '#2E2C2A');
     btn.appendChild(previewC);
     btn.addEventListener('click', () => selectStamp(shape.id));
-    panel.insertBefore(btn, panel.querySelector('.divider'));
+    panel.appendChild(btn);
   });
 }
 buildStampPanel();
@@ -573,10 +488,13 @@ function updateCursorCanvas() {
 }
 
 document.addEventListener('mousemove', e => {
-  if (tool === 'stamp' && stampShapeId) {
+  const r = container.getBoundingClientRect();
+  const inside = e.clientX>=r.left && e.clientX<=r.right && e.clientY>=r.top && e.clientY<=r.bottom;
+  if (tool === 'stamp' && stampShapeId && inside) {
+    const ar = appEl.getBoundingClientRect();
     stampCursorEl.style.display = 'block';
-    stampCursorEl.style.left = e.clientX + 'px';
-    stampCursorEl.style.top  = e.clientY + 'px';
+    stampCursorEl.style.left = ((e.clientX - ar.left) / APP_SCALE) + 'px';
+    stampCursorEl.style.top  = ((e.clientY - ar.top)  / APP_SCALE) + 'px';
   } else {
     stampCursorEl.style.display = 'none';
   }
@@ -633,25 +551,19 @@ function fillBG() {
 function mirrorToB() {
   if (variant !== 1) return;
   const w = canvasA.width, h = canvasA.height;
-  const imgData = ctxA.getImageData(0, 0, w, h);
-  const d = imgData.data;
-  const inv = new Uint8ClampedArray(d.length);
-  for (let i=0;i<d.length;i+=4){
-    inv[i]=255-d[i]; inv[i+1]=255-d[i+1]; inv[i+2]=255-d[i+2]; inv[i+3]=d[i+3];
-  }
-  const mir = new Uint8ClampedArray(d.length);
-  if (orientation === 'horizontal') {
-    for(let y=0;y<h;y++) for(let x=0;x<w;x++){
-      const s=(y*w+x)*4, dt=(y*w+(w-1-x))*4;
-      mir[dt]=inv[s];mir[dt+1]=inv[s+1];mir[dt+2]=inv[s+2];mir[dt+3]=inv[s+3];
-    }
-  } else {
-    for(let y=0;y<h;y++) for(let x=0;x<w;x++){
-      const s=(y*w+x)*4, dt=((h-1-y)*w+x)*4;
-      mir[dt]=inv[s];mir[dt+1]=inv[s+1];mir[dt+2]=inv[s+2];mir[dt+3]=inv[s+3];
-    }
-  }
-  ctxB.putImageData(new ImageData(mir,w,h),0,0);
+  ctxB.save();
+  ctxB.globalCompositeOperation = 'source-over';
+  ctxB.globalAlpha = 1;
+  ctxB.setTransform(1,0,0,1,0,0);
+  if (orientation === 'horizontal') { ctxB.translate(w, 0); ctxB.scale(-1, 1); }
+  else { ctxB.translate(0, h); ctxB.scale(1, -1); }
+  ctxB.drawImage(canvasA, 0, 0);
+  ctxB.setTransform(1,0,0,1,0,0);
+  // invertē krāsas: balts – attēls = negatīvs
+  ctxB.globalCompositeOperation = 'difference';
+  ctxB.fillStyle = '#FFFFFF';
+  ctxB.fillRect(0, 0, w, h);
+  ctxB.restore();
 }
 
 // ══════════════════════════════════════════
@@ -791,9 +703,10 @@ function updateVariant(v) {
   } else {
     ep.classList.add('visible'); es.classList.add('visible');
     canvasB.style.display='none'; br.style.display='none';
-    document.getElementById('hintText').textContent='Ešera režīms – izvēlies figūru, krāsu, izmēru un pagriezienu, spiedi uz lapas lai ieliek figūru. Veido mozaīku, kur forma un fons mainās vietām.';
+    document.getElementById('hintText').textContent='Ešera režīms – izvēlies figūru, krāsu, izmēru un pagriezienu, tad spied uz lapas, lai ieliktu figūru. Veido mozaīku, kur forma un fons mainās vietām.';
   }
   container.classList.toggle('escher-mode',v===3);
+  document.getElementById('orientSec').style.display = v===3 ? 'none' : '';
   setCanvasSizes(); updateOrientLabel();
 }
 
@@ -826,8 +739,8 @@ function setEscherColor(c){
     if(!shape) return;
     const pc=btn.querySelector('canvas');
     const pCtx=pc.getContext('2d');
-    pCtx.clearRect(0,0,40,40);
-    shape.draw(pCtx,40,40,c==='#888888'?'#2E2C2A':c);
+    pCtx.clearRect(0,0,PREV,PREV);
+    shape.draw(pCtx,PREV,PREV,c==='#888888'?'#2E2C2A':c);
   });
 }
 
@@ -842,6 +755,46 @@ document.getElementById('orientH').addEventListener('click',()=>updateOrientatio
 document.getElementById('orientV').addEventListener('click',()=>updateOrientation('vertical'));
 
 document.getElementById('clearBtn').addEventListener('click',()=>fillBG());
+
+window.addEventListener('mouseup', ()=>{ if(isDrawing) onDrawEnd(); });
+
+// ══════════════════════════════════════════
+//  16:9 MĒROGOŠANA UN PILNEKRĀNS
+// ══════════════════════════════════════════
+function fitApp(){
+  const W = window.innerWidth, H = window.innerHeight;
+  APP_SCALE = Math.min(W/1600, H/900);
+  appEl.style.transform = `scale(${APP_SCALE})`;
+  appEl.style.left = Math.max(0,(W-1600*APP_SCALE)/2)+'px';
+  appEl.style.top  = Math.max(0,(H-900*APP_SCALE)/2)+'px';
+}
+window.addEventListener('resize', fitApp);
+fitApp();
+
+const fsBtn = document.getElementById('fsBtn');
+function isFullscreen(){ return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+function fsFallback(){
+  if (confirm('Pilnekrāna režīms šajā logā nav pieejams. Atvērt rīku jaunā cilnē?')) window.open(location.href, '_blank');
+}
+function toggleFullscreen(){
+  const el = document.documentElement;
+  try {
+    if (isFullscreen()) {
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    } else if (el.requestFullscreen) {
+      el.requestFullscreen().catch(fsFallback);
+    } else if (el.webkitRequestFullscreen) {
+      el.webkitRequestFullscreen();
+    } else fsFallback();
+  } catch(err){ fsFallback(); }
+}
+function updateFsBtn(){
+  fsBtn.textContent = isFullscreen() ? '✕ Iziet no pilnekrāna' : '⛶ Atvērt pilnekrānu';
+  setTimeout(fitApp, 60);
+}
+fsBtn.addEventListener('click', toggleFullscreen);
+document.addEventListener('fullscreenchange', updateFsBtn);
+document.addEventListener('webkitfullscreenchange', updateFsBtn);
 
 // ── INIT ──
 updateVariant(1);
